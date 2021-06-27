@@ -10,14 +10,11 @@ public class GameManager : MonoBehaviour
 
     //Array to handle all spawn locations for the pieces
     public GameObject[] spawnLocations;
+
+    //Default player turn will be Player 1
+    bool bPlayer1Turn = true;
     // Start is called before the first frame update
     void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
     {
         
     }
@@ -31,7 +28,21 @@ public class GameManager : MonoBehaviour
 
     void PlayTurn(int column)
     {
-        Instantiate(player1, spawnLocations[column].transform.position, Quaternion.identity);
+        //Player 1 is playing the turn
+        if (bPlayer1Turn)
+        {
+            //Spawn the piece in the right column and then switch to other player
+            Instantiate(player1, spawnLocations[column].transform.position, Quaternion.identity);
+            bPlayer1Turn = false;
+        }
+        else
+        {
+            /*TODO Here goes the AI behaviour, in the meantime for test, will be like player 2 */
+            //Spawn the piece in the right column and then switch to other player
+            Instantiate(playerAI, spawnLocations[column].transform.position, Quaternion.identity);
+            bPlayer1Turn = true;
+        }
+        
     }
 
 }
