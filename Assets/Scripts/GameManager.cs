@@ -18,6 +18,10 @@ public class GameManager : MonoBehaviour
     int boardStatus_player1 = 1;
     int boardStatus_AI = 2;
 
+    //A timer variable to delay a bit the AI actions
+    float timerBeforeAction = 0f;
+    float timerLimit = 2f;
+
     //Array to handle all spawn locations for the pieces
     public GameObject[] spawnLocations;
 
@@ -29,19 +33,44 @@ public class GameManager : MonoBehaviour
     {
         //Set the Board Status with the board length and height at the start to prevent null reference
         boardStatus = new int[boardLenght, boardHeight];
+
+    }
+
+    void Update()
+    {
+        //Check whenever is AI turn to Play
+        if (!bPlayer1Turn)
+        {
+            //Timer Delay before AI takes turn
+            timerBeforeAction += Time.deltaTime;
+            Debug.Log("Timer Starting: " + timerBeforeAction);
+            if (timerBeforeAction >= timerLimit)
+            {
+                //AI executes the turn
+                Debug.Log("Timer Done");
+                AITurn(SelectColumnAI());
+                timerBeforeAction = 0f;
+            }
+
+            
+        }
     }
 
     /*Function to let GameManager know which column is being selected from InputColumn*/
     public void SelectColumn(int column)
     {
         Debug.Log("GameManager Column is: " + column);
-        PlayTurn(column);
+        if (bPlayer1Turn)
+        {
+            PlayerTurn(column);
+        }
+       
     }
 
-    void PlayTurn(int column)
+    void PlayerTurn(int column)
     {
         //First thing to do is check the Board status,
-        if(UpdateBoardStatus(column))
+        if (UpdateBoardStatus(column))
         {
             //Player 1 is playing the turn
             if (bPlayer1Turn)
@@ -52,28 +81,23 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                /*TODO Here goes the AI behaviour, in the meantime for test, will be like player 2 */
-                //Spawn the piece in the right column and then switch to other player
-                Instantiate(playerAI, spawnLocations[column].transform.position, Quaternion.identity);
-                bPlayer1Turn = true;
+              
             }
         }
-        
-        
     }
-
+    //Function to update the board status of the Game
     bool UpdateBoardStatus(int column)
     {
         //iterate through rows
-        for(int row = 0; row < boardHeight; row++)
+        for (int row = 0; row < boardHeight; row++)
         {
             //Check if it is empty
-            if(boardStatus[column,row] == boardStatus_empty)
+            if (boardStatus[column, row] == boardStatus_empty)
             {
                 //If Player 1 is the one to update board status
-                if(bPlayer1Turn)
+                if (bPlayer1Turn)
                 {
-                    boardStatus[column,row] = boardStatus_player1;
+                    boardStatus[column, row] = boardStatus_player1;
                 }
                 //If AI is the one to update board status
                 else
@@ -83,10 +107,63 @@ public class GameManager : MonoBehaviour
                 Debug.Log("Piece being spawned at ( " + column + ", " + row + ")");
                 return true;
             }
-            
+
         }
         Debug.LogWarning("Column " + column + " is full");
         return false;
     }
 
+    //Function to retrieve a valid column selection for the AI
+    int SelectColumnAI()
+    {
+        int columnSelected = 0;
+        bool bSelected = false;
+        //Validate that it is indeed AI turn
+        if (!bPlayer1Turn)
+        {
+            Debug.Log("AI will Select Column");
+            if(!bSelected)
+            {
+                //Random of the selected column
+                columnSelected = (int)Random.Range(0, boardLenght);
+                Debug.Log("Column Selected");
+                //iterate through rows
+                for (int row = 0; row < boardHeight; row++)
+                {
+                    Debug.Log("checking if Empty");
+                    //Check if it is empty position
+                    if (boardStatus[columnSelected, row] == boardStatus_empty)
+                    {
+                        Debug.Log("Valid Column Selected");
+                        bSelected = true;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                
+            } 
+        }
+        return columnSelected;
+    }
+    //Function to manage AI turn
+    void AITurn(int column)
+    {
+        //First thing to do is check the Board status,
+        if (UpdateBoardStatus(column))
+        {
+            //Player AI is playing the turn
+            if (!bPlayer1Turn)
+            {
+                Instantiate(playerAI, spawnLocations[column].transform.position, Quaternion.identity);
+                bPlayer1Turn = true;
+            }
+            else
+            {
+
+            }
+        }
+
+    }
 }
