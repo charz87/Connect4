@@ -59,9 +59,11 @@ public class GameManager : MonoBehaviour
     /*Function to let GameManager know which column is being selected from InputColumn*/
     public void SelectColumn(int column)
     {
+        //Check if it is indeed player 1 turn
         Debug.Log("GameManager Column is: " + column);
         if (bPlayer1Turn)
         {
+            //Do the Player Turn
             PlayerTurn(column);
         }
        
@@ -78,6 +80,11 @@ public class GameManager : MonoBehaviour
                 //Spawn the piece in the right column and then switch to other player
                 Instantiate(player1, spawnLocations[column].transform.position, Quaternion.identity);
                 bPlayer1Turn = false;
+                //Check if Player 1 Wins
+                if (DidWin(boardStatus_player1))
+                {
+                    Debug.LogWarning("Player 1 Wins!!!");
+                }
             }
             else
             {
@@ -117,7 +124,7 @@ public class GameManager : MonoBehaviour
     int SelectColumnAI()
     {
         int columnSelected = 0;
-        bool bSelected = false;
+        bool bSelected = false; //to check if selected position is a valid one
         //Validate that it is indeed AI turn
         if (!bPlayer1Turn)
         {
@@ -142,7 +149,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                
+                /*Do Nothing*/
             } 
         }
         return columnSelected;
@@ -158,12 +165,71 @@ public class GameManager : MonoBehaviour
             {
                 Instantiate(playerAI, spawnLocations[column].transform.position, Quaternion.identity);
                 bPlayer1Turn = true;
+                //Check if AI Wins
+                if (DidWin(boardStatus_AI))
+                {
+                    Debug.LogWarning("Player AI Wins!!!");
+                }
             }
             else
             {
-
+                /*Do Nothing*/
             }
         }
 
+    }
+    bool DidWin(int playerNumber)
+    {
+        //Horizontal Check for a win, -3 is to not worry if only last 3 columns are left, since a connect 4 there would be not possible
+        for(int x = 0; x < boardLenght - 3; x++ )
+        {
+            //Vertical Iteration
+            for(int y = 0; y < boardHeight; y++)
+            {
+                //Check if x positions up to 4 have been assigned to a player number
+                if(boardStatus[x,y] == playerNumber && boardStatus[x+1,y] == playerNumber && boardStatus[x + 2, y] == playerNumber && boardStatus[x + 3, y] == playerNumber) 
+                {
+                    return true;
+                }
+            }
+
+        }
+        //Vertical Check for a win
+        for(int x = 0; x < boardLenght; x++)
+        {
+            for(int y = 0; y < boardHeight - 3; y++)
+            {
+                //Check if  y positions up to 4 have been assigned to a player number
+                if (boardStatus[x,y] == playerNumber && boardStatus[x, y+1] == playerNumber && boardStatus[x, y+2] == playerNumber && boardStatus[x, y+3] == playerNumber)
+                {
+                    return true;
+                }
+            }
+        }
+        //Diagonal Up Check for a Win
+        for (int x = 0; x < boardLenght - 3; x++)
+        {
+            for (int y = 0; y < boardHeight - 3; y++)
+            {
+                //Check if x and y positions up to 4 have been assigned to a player number
+                if (boardStatus[x, y] == playerNumber && boardStatus[x + 1, y + 1] == playerNumber && boardStatus[x + 2, y + 2] == playerNumber && boardStatus[x + 3, y + 3] == playerNumber)
+                {
+                    return true;
+                }
+            }
+        }
+        //Diagonal Down Check for a Win
+        for (int x = 0; x < boardLenght - 3; x++)
+        {
+            for (int y = 0; y < boardHeight - 3; y++)
+            {
+                //Check if x and y positions up to 4 have been assigned to a player number
+                if (boardStatus[x, y + 3] == playerNumber && boardStatus[x + 1, y + 2] == playerNumber && boardStatus[x + 2, y + 1] == playerNumber && boardStatus[x + 3, y] == playerNumber)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
