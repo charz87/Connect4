@@ -1,12 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     //Game objects of the Player and AI
     public GameObject player1;
     public GameObject playerAI;
+
+    public GameObject winScreen;
+    public Text winText;
 
     //The values representing the length and height of the board
     int boardHeight = 6;
@@ -27,19 +32,22 @@ public class GameManager : MonoBehaviour
 
     //Default player turn will be Player 1
     bool bPlayer1Turn = true;
+    //Detect when any player wins and stop some logic
+    bool bplayerWon = false;
 
     // Start is called before the first frame update
     void Start()
     {
         //Set the Board Status with the board length and height at the start to prevent null reference
         boardStatus = new int[boardLenght, boardHeight];
+        winScreen.SetActive(false);
 
     }
 
     void Update()
     {
         //Check whenever is AI turn to Play
-        if (!bPlayer1Turn)
+        if (!bPlayer1Turn && !bplayerWon)
         {
             //Timer Delay before AI takes turn
             timerBeforeAction += Time.deltaTime;
@@ -61,7 +69,7 @@ public class GameManager : MonoBehaviour
     {
         //Check if it is indeed player 1 turn
         Debug.Log("GameManager Column is: " + column);
-        if (bPlayer1Turn)
+        if (bPlayer1Turn && !bplayerWon)
         {
             //Do the Player Turn
             PlayerTurn(column);
@@ -83,7 +91,11 @@ public class GameManager : MonoBehaviour
                 //Check if Player 1 Wins
                 if (DidWin(boardStatus_player1))
                 {
+                    bplayerWon = true;
+                    winScreen.SetActive(true);
                     Debug.LogWarning("Player 1 Wins!!!");
+                    winText.text = "PLAYER 1 WINS!!!!";
+                    winText.color = Color.red;
                 }
             }
             else
@@ -168,7 +180,11 @@ public class GameManager : MonoBehaviour
                 //Check if AI Wins
                 if (DidWin(boardStatus_AI))
                 {
+                    bplayerWon = true;
+                    winScreen.SetActive(true);
                     Debug.LogWarning("Player AI Wins!!!");
+                    winText.text = "PLAYER AI WINS!!!!";
+                    winText.color = Color.yellow;
                 }
             }
             else
@@ -232,4 +248,15 @@ public class GameManager : MonoBehaviour
         }
         return false;
     }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+        Debug.LogWarning("Quitting Game");
+    }
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(0);
+    }
+
 }
