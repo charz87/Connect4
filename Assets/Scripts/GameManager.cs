@@ -51,11 +51,9 @@ public class GameManager : MonoBehaviour
         {
             //Timer Delay before AI takes turn
             timerBeforeAction += Time.deltaTime;
-            Debug.Log("Timer Starting: " + timerBeforeAction);
             if (timerBeforeAction >= timerLimit)
             {
                 //AI executes the turn
-                Debug.Log("Timer Done");
                 AITurn(SelectColumnAI());
                 timerBeforeAction = 0f;
             }
@@ -68,7 +66,6 @@ public class GameManager : MonoBehaviour
     public void SelectColumn(int column)
     {
         //Check if it is indeed player 1 turn
-        Debug.Log("GameManager Column is: " + column);
         if (bPlayer1Turn && !bplayerWon)
         {
             //Do the Player Turn
@@ -93,7 +90,6 @@ public class GameManager : MonoBehaviour
                 {
                     bplayerWon = true;
                     winScreen.SetActive(true);
-                    Debug.LogWarning("Player 1 Wins!!!");
                     winText.text = "PLAYER 1 WINS!!!!";
                     winText.color = Color.red;
                 }
@@ -123,12 +119,10 @@ public class GameManager : MonoBehaviour
                 {
                     boardStatus[column, row] = boardStatus_AI;
                 }
-                Debug.Log("Piece being spawned at ( " + column + ", " + row + ")");
                 return true;
             }
 
         }
-        Debug.LogWarning("Column " + column + " is full");
         return false;
     }
 
@@ -140,20 +134,16 @@ public class GameManager : MonoBehaviour
         //Validate that it is indeed AI turn
         if (!bPlayer1Turn)
         {
-            Debug.Log("AI will Select Column");
             if(!bSelected)
             {
                 //Random of the selected column
                 columnSelected = (int)Random.Range(0, boardLenght);
-                Debug.Log("Column Selected");
                 //iterate through rows
                 for (int row = 0; row < boardHeight; row++)
                 {
-                    Debug.Log("checking if Empty");
                     //Check if it is empty position
                     if (boardStatus[columnSelected, row] == boardStatus_empty)
                     {
-                        Debug.Log("Valid Column Selected");
                         bSelected = true;
                         break;
                     }
@@ -182,7 +172,6 @@ public class GameManager : MonoBehaviour
                 {
                     bplayerWon = true;
                     winScreen.SetActive(true);
-                    Debug.LogWarning("Player AI Wins!!!");
                     winText.text = "PLAYER AI WINS!!!!";
                     winText.color = Color.yellow;
                 }
@@ -248,12 +237,13 @@ public class GameManager : MonoBehaviour
         }
         return false;
     }
-
+    //Function to enables the Quit of the Game
     public void QuitGame()
     {
         Application.Quit();
         Debug.LogWarning("Quitting Game");
     }
+    //Function to Reset the Game
     public void RestartGame()
     {
         SceneManager.LoadScene(0);
